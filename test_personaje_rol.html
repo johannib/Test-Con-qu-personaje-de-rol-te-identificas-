@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Qué personaje de rol eres?</title>
+<style>
+:root{--ink:#29243a;--muted:#625d70;--paper:#fffaf0;--card:#fff;--accent:#7046a3;--line:#e8dfef}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f5edff,#fff8e9);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:780px;margin:32px auto;padding:18px}.hero,.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 8px 28px #34204a12}
+.hero{text-align:center;margin-bottom:18px}.eyebrow{color:var(--accent);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem}
+h1{font-size:clamp(2rem,6vw,3rem);line-height:1.05;margin:8px 0 12px}h2{margin-top:0}.intro{color:var(--muted);max-width:580px;margin:auto}
+.progress{height:8px;background:#eee8f5;border-radius:9px;overflow:hidden;margin:0 0 22px}.bar{height:100%;width:0;background:var(--accent);transition:width .2s}
+.question{padding:18px 0;border-bottom:1px solid var(--line)}.question:last-of-type{border:0}.question h3{font-size:1.08rem;margin:0 0 12px}
+.options{display:grid;gap:9px}.option{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);padding:11px 13px;border-radius:12px;cursor:pointer;background:#fff}.option:hover{border-color:var(--accent);background:#fbf8ff}.option input{margin-top:5px;accent-color:var(--accent)}
+button{border:0;background:var(--accent);color:white;font-weight:750;padding:13px 20px;border-radius:12px;font-size:1rem;cursor:pointer;margin-top:18px}button:hover{filter:brightness(.93)}button.secondary{background:#eee8f5;color:var(--ink);margin-left:8px}
+#error{color:#a52b45;font-weight:650;min-height:1.5em;margin-top:10px}
+#result{display:none}.result-head{text-align:center;padding-bottom:12px}.emoji{font-size:3rem}.class{font-size:2rem;color:var(--accent);font-weight:850;margin:0}.subtitle{color:var(--muted);margin-top:4px}
+ul{padding-left:22px}li{margin:7px 0}.tip{background:#f7f1ff;border-radius:12px;padding:13px 15px;margin-top:14px}.small{font-size:.9rem;color:var(--muted)}
+@media(max-width:520px){main{margin:10px auto;padding:10px}.hero,.panel{padding:18px}.secondary{margin-left:0}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<div class="eyebrow">Mini test de fantasía · 2 minutos</div>
+<h1>¿Qué personaje de rol llevas dentro?</h1>
+<p class="intro">Responde sin pensarlo demasiado y descubre qué clase encaja más contigo. Al final tendrás ideas para caracterizarte con cosas que probablemente ya tienes por casa.</p>
+</section>
+<section class="panel" id="quiz">
+<div class="progress"><div class="bar" id="bar"></div></div>
+<form id="form">
+<div id="questions"></div>
+<div id="error" aria-live="polite"></div>
+<button type="submit">Descubrir mi personaje ✨</button>
+</form>
+</section>
+<section class="panel" id="result" aria-live="polite">
+<div class="result-head"><div class="emoji" id="emoji"></div><p class="class" id="class"></p><p class="subtitle" id="subtitle"></p></div>
+<h2>Tu caracterización exprés</h2>
+<ul id="ideas"></ul>
+<div class="tip"><strong>Truco:</strong> no hace falta disfraz completo. Elige dos o tres detalles, añade una actitud característica y ¡ya tienes personaje!</div>
+<button onclick="restart()">Repetir el test</button>
+<button class="secondary" onclick="window.print()">Imprimir resultado</button>
+</section>
+<p class="small" style="text-align:center;margin:18px">Test lúdico y orientativo: ¡no es una clasificación seria de personalidad!</p>
+</main>
+<script>
+const classes = {
+"Bardo":{emoji:"🎻",sub:"Carisma, creatividad y un talento especial para animar al grupo.",ideas:["Una bufanda o pañuelo llamativo como capa corta.","Un instrumento pequeño, real o improvisado (pandereta, flauta de juguete o sonajero).","Anillos grandes, pendientes o pulseras; puedes hacerlos con cartón pintado.","Un cuaderno con canciones, poemas o historias inventadas.","Actitud: habla con entusiasmo, brinda y presume de tus hazañas."]},
+"Druida":{emoji:"🌿",sub:"Conexión con la naturaleza, calma y un puntito misterioso.",ideas:["Una corona o diadema con hojas (naturales caídas o de papel).","Una cuerda fina o cinturón con una bolsita de hierbas aromáticas.","Un colgante de madera, una piedra bonita o una piña pequeña.","Maquillaje verde/marrón muy sutil o una pequeña hoja dibujada en la mejilla.","Actitud: observa todo, habla de plantas y protege a cualquier criatura."]},
+"Mago":{emoji:"🔮",sub:"Curiosidad, conocimiento y soluciones poco convencionales.",ideas:["Gafas llamativas o unas gafas sin graduación como toque académico.","Un libro viejo o libreta convertido en grimorio con una etiqueta hecha a mano.","Una varita hecha con un lápiz o una ramita decorada con hilo.","Una bufanda larga o pañuelo oscuro sobre los hombros.","Actitud: murmura fórmulas, consulta tu grimorio y explica cosas complicadísimas."]},
+"Clérigo":{emoji:"✨",sub:"Apoyo, serenidad y una brújula moral bastante firme.",ideas:["Un símbolo sagrado de cartón o arcilla en un cordón.","Una tela clara a modo de estola o pañuelo sobre los hombros.","Una pulsera de cuentas o medallita sencilla.","Un pequeño frasco decorado como poción curativa (vacío).","Actitud: ofrece bendiciones, cura heridas imaginarias y anima al equipo."]},
+"Pícaro":{emoji:"🗝️",sub:"Ingenio, sigilo y recursos para salir de cualquier apuro.",ideas:["Un pañuelo oscuro al cuello o cubriendo parcialmente la cabeza.","Un cinturón con bolsillos, una riñonera pequeña o una bolsita para herramientas.","Una llave vieja como colgante o varias llaves sujetas al cinturón.","Guantes sin dedos hechos con unos calcetines viejos cortados.","Actitud: sonríe de lado, mira alrededor y asegura que tienes un plan."]},
+"Guerrero":{emoji:"⚔️",sub:"Valentía, determinación y presencia de quien va al frente.",ideas:["Un cinturón ancho o una cinta cruzada sobre el pecho.","Una muñequera hecha con tela, cartón flexible o una venda limpia.","Un escudo pequeño de cartón como accesorio opcional.","Una capa corta hecha con una sábana o pañuelo sujeto con un broche.","Actitud: postura firme, protege al grupo y presume de tus gestas."]},
+"Explorador":{emoji:"🏹",sub:"Observación, autonomía y ganas de descubrir caminos nuevos.",ideas:["Una bandana o pañuelo en la cabeza o el cuello.","Una mochila pequeña con una cuerda enrollada por fuera.","Un mapa dibujado a mano y una brújula de juguete o de llavero.","Colores tierra y una cantimplora o botella reutilizable.","Actitud: señala rutas, detecta huellas imaginarias y siempre va un paso por delante."]},
+"Paladín":{emoji:"🛡️",sub:"Honor, protección y un sentido del deber inquebrantable.",ideas:["Un pañuelo claro cruzado como banda o una tela a modo de pequeña capa.","Un símbolo de sol, estrella o escudo hecho en cartón y prendido a la ropa.","Un cinturón con una hebilla grande o decorada.","Una pulsera metálica o dorada, o papel dorado como detalle.","Actitud: habla de honor, cumple tus promesas y defiende al grupo."]}
+};
+const qs=[
+["En una aventura, ¿qué te sale hacer primero?",[["Improvisar una canción o convencer a alguien","Bardo"],["Buscar rastros, plantas y señales del entorno","Druida"],["Investigar qué misterio o magia hay detrás","Mago"],["Comprobar que todo el mundo está bien","Clérigo"],["Buscar una entrada secreta o un atajo","Pícaro"],["Ponerme delante y afrontar el peligro","Guerrero"],["Orientarme y explorar la zona","Explorador"],["Organizar al grupo y proteger a los demás","Paladín"]]],
+["¿Qué objeto elegirías llevar siempre?",[["Un instrumento o una baraja","Bardo"],["Una bolsita con semillas o piedras","Druida"],["Un libro lleno de anotaciones","Mago"],["Un amuleto o símbolo especial","Clérigo"],["Una ganzúa o un manojo de llaves","Pícaro"],["Un objeto resistente que pueda servir de defensa","Guerrero"],["Un mapa y una brújula","Explorador"],["Un emblema que represente mis ideales","Paladín"]]],
+["¿Qué dicen tus amistades que aportas al grupo?",[["Alegría e imaginación","Bardo"],["Sentido común y conexión con lo natural","Druida"],["Ideas y datos curiosos","Mago"],["Apoyo y capacidad para escuchar","Clérigo"],["Pillería y soluciones inesperadas","Pícaro"],["Decisión cuando toca actuar","Guerrero"],["Iniciativa y capacidad para apañarme","Explorador"],["Lealtad y protección","Paladín"]]],
+["¿Cómo resolverías una puerta cerrada?",[["Distraería al guardia con una actuación","Bardo"],["Buscaría una forma natural de rodearla","Druida"],["Probaría un hechizo o acertijo","Mago"],["Pediría ayuda con educación y paciencia","Clérigo"],["Buscaría una cerradura fácil o una ventana","Pícaro"],["La abriría por la fuerza si no hay otra","Guerrero"],["Inspeccionaría la zona en busca de otra ruta","Explorador"],["Intentaría encontrar una solución justa y segura","Paladín"]]],
+["Elige tu plan ideal para una tarde de aventura:",[["Taberna, música y conocer gente","Bardo"],["Bosque, animales y aire libre","Druida"],["Biblioteca antigua y enigmas","Mago"],["Ayudar a alguien y compartir historias","Clérigo"],["Calles misteriosas y secretos","Pícaro"],["Entrenamiento y desafíos","Guerrero"],["Una ruta por lugares desconocidos","Explorador"],["Una misión con un propósito importante","Paladín"]]]
+];
+const root=document.getElementById('questions');
+qs.forEach((q,i)=>{const d=document.createElement('section');d.className='question';d.innerHTML=`<h3>${i+1}. ${q[0]}</h3><div class="options"></div>`;q[1].forEach(([label,val])=>{const l=document.createElement('label');l.className='option';l.innerHTML=`<input type="radio" name="q${i}" value="${val}"><span>${label}</span>`;d.querySelector('.options').appendChild(l)});root.appendChild(d)});
+document.getElementById('form').addEventListener('change',()=>{let n=0;qs.forEach((_,i)=>{if(document.querySelector(`input[name=q${i}]:checked`))n++});document.getElementById('bar').style.width=(n/qs.length*100)+'%'});
+document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();let scores={};let missing=false;qs.forEach((_,i)=>{let a=document.querySelector(`input[name=q${i}]:checked`);if(!a)missing=true;else scores[a.value]=(scores[a.value]||0)+1});if(missing){document.getElementById('error').textContent='¡Te falta responder alguna pregunta!';return}let top=Object.keys(scores).sort((a,b)=>scores[b]-scores[a]);let winner=top[0];let data=classes[winner];document.getElementById('emoji').textContent=data.emoji;document.getElementById('class').textContent='¡Eres '+winner+'!';document.getElementById('subtitle').textContent=data.sub;document.getElementById('ideas').innerHTML=data.ideas.map(x=>'<li>'+x+'</li>').join('');document.getElementById('quiz').style.display='none';document.getElementById('result').style.display='block';window.scrollTo({top:0,behavior:'smooth'})});
+function restart(){document.getElementById('form').reset();document.getElementById('bar').style.width='0';document.getElementById('error').textContent='';document.getElementById('result').style.display='none';document.getElementById('quiz').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
+</script>
+</body></html>
